@@ -1,4 +1,5 @@
 import csv
+from multiprocessing import Value
 
 
 def cargar_csv(nombre_archivo):
@@ -54,7 +55,95 @@ def listar_paises(lista_paises):
 
 def agregar_pais(lista_paises):
     """Solicita datos al usuario y agrega un nuevo país a la lista."""
-    pass
+
+    while True:
+        try:
+
+            nombre = input(
+                "Ingrese el nombre del País que desea agregar: ").strip().lower()
+            # Verifico que el nombre no esté vacío
+            if nombre == "":
+                raise ValueError("Nombre vacío.")
+
+            # Verifico que el país que se desea ingresar no exista para evitar duplicados.
+            encontrado = False
+            for pais in lista_paises:
+
+                if pais["nombre"].lower() == nombre:
+                    encontrado = True
+                    break
+            if encontrado:
+                raise ValueError("El país que desea ingresar ya existe.")
+
+            break
+        # De haber un error lo capturo y muestro por pantalla.
+        except ValueError as error:
+            print("Ha ocurrido el siguiente error: ", error)
+
+    while True:
+        try:
+
+            poblacion = int(input("Ingrese el número de la población: "))
+            # Verifico que el número proporcionado no sea negativo ni 0.
+            if poblacion <= 0:
+                raise ValueError(
+                    "La población nunca puede ser menor o igual a 0.")
+
+            break
+
+        except ValueError as error:
+            print("Ha ocurrido el siguiente error: ", error)
+
+    while True:
+        try:
+
+            superficie = int(
+                input("Ingrese el número de la superficie en km²: "))
+
+            if superficie <= 0:
+                raise ValueError(
+                    "La superficie nunca puede ser menor o igual a 0.")
+
+            break
+
+        except ValueError as error:
+            print("Ha ocurrido el siguiente error: ", error)
+
+    while True:
+        try:
+
+            continente = input(
+                "Ingrese el nombre del continente al que pertenece su país: ").strip().lower()
+
+            if continente == "":
+                raise ValueError("Nombre del continente vacío.")
+
+            break
+        except ValueError as error:
+            print("Ha ocurrido el siguiente error: ", error)
+
+    nuevo_pais = {
+        "nombre": nombre,
+        "poblacion": poblacion,
+        "superficie": superficie,
+        "continente": continente
+    }
+
+    try:
+        with open("paises.csv", "a", encoding="utf-8", newline="") as archivo:
+            writer = csv.DictWriter(archivo, fieldnames=[
+                "nombre", "poblacion", "superficie", "continente"])
+            writer.writerow(nuevo_pais)
+
+        lista_paises.append(nuevo_pais)
+        print(f"{nombre.title()} agregado correctamente.")
+
+    # Valido que el archivo no tenga problemas de permisos o este bloqueado
+    except PermissionError:
+        print("Error: no se tienen permisos para escribir en el archivo.")
+    # Valido que no haya errores como una ruta mal definida.
+    except OSError as error:
+        print("Error al intentar escribir en el archivo: ", error)
 
 
 def actualizar_pais(lista_paises):
