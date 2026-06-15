@@ -257,7 +257,34 @@ def actualizar_pais(lista_paises):
 
 def buscar_por_nombre(lista_paises):
     """Busca y muestra países cuyo nombre coincida parcial o exactamente."""
-    pass
+
+    while True:
+        try:
+
+            busqueda = input(
+                "\nIngrese el nombre o parte del nombre del país que desea buscar: "
+            ).strip().lower()
+
+            if busqueda == "":
+                raise ValueError("La búsqueda no puede estar vacía.")
+
+            break
+
+        except ValueError as error:
+            print("\nHa ocurrido el siguiente error:", error)
+
+    encontrados = False
+
+    for pais in lista_paises:
+
+        if busqueda in pais["nombre"].lower():
+
+            print("-"*30)
+            mostrar_pais(pais)
+            encontrados = True
+
+    if not encontrados:
+        print("No se encontraron coincidencias.")
 
 
 def filtrar_paises(lista_paises):
