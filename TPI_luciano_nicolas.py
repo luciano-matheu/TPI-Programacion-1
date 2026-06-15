@@ -289,7 +289,129 @@ def buscar_por_nombre(lista_paises):
 
 def filtrar_paises(lista_paises):
     """Muestra un submenú para filtrar por continente, población o superficie."""
-    pass
+
+    while True:
+        try:
+            print("\n¿Por qué desea filtrar?")
+            print("1. Continente")
+            print("2. Rango de población")
+            print("3. Rango de superficie")
+
+            opcion = int(input("Seleccione una opción [1-3]: "))
+
+            if opcion not in [1, 2, 3]:
+                raise ValueError("Opción fuera de rango.")
+
+            break
+
+        except ValueError as error:
+            print("\nHa ocurrido el siguiente error:", error)
+
+    if opcion == 1:
+
+        while True:
+            try:
+
+                print("Busqueda por continente.")
+
+                continente = input(
+                    "\nIngrese el nombre del continente: "
+                ).strip().lower()
+
+                if continente == "":
+                    raise ValueError("La búsqueda no puede estar vacía.")
+
+                break
+
+            except ValueError as error:
+                print("\nHa ocurrido el siguiente error:", error)
+
+        encontrados = False
+
+        for pais in lista_paises:
+
+            if pais["continente"].lower() == continente:
+
+                print("-"*30)
+                mostrar_pais(pais)
+                encontrados = True
+
+        if not encontrados:
+            print("No se encontraron coincidencias.")
+
+    elif opcion == 2:
+
+        while True:
+
+            try:
+                print("Busqueda por rangos de Población.")
+
+                rango_minimo = int(
+                    input("Ingrese el rango mínimo de población: "))
+                rango_maximo = int(
+                    input("Ingrese el rango máximo de población: "))
+
+                if rango_minimo < 0 or rango_maximo < 0:
+                    raise ValueError("El rango no puede ser negativo")
+                # Valido que el rango mínimo no sea más grande que el máximo
+                if rango_minimo > rango_maximo:
+                    raise ValueError(
+                        "El rango mínimo no puede ser mayor al máximo.")
+
+                break
+
+            except ValueError as error:
+                print("\nHa ocurrido el siguiente error:", error)
+
+        encontrados = False
+
+        for pais in lista_paises:
+
+            if rango_minimo <= pais["poblacion"] <= rango_maximo:
+
+                print("-"*30)
+                mostrar_pais(pais)
+                encontrados = True
+
+        if not encontrados:
+            print("No se encontraron coincidencias.")
+
+    elif opcion == 3:
+
+        while True:
+
+            try:
+                print("Busqueda por rangos de Superficie.")
+
+                rango_minimo = int(
+                    input("Ingrese el rango mínimo de superficie: "))
+                rango_maximo = int(
+                    input("Ingrese el rango máximo de superficie: "))
+
+                if rango_minimo < 0 or rango_maximo < 0:
+                    raise ValueError("El rango no puede ser negativo")
+
+                if rango_minimo > rango_maximo:
+                    raise ValueError(
+                        "El rango mínimo no puede ser mayor al máximo.")
+
+                break
+
+            except ValueError as error:
+                print("\nHa ocurrido el siguiente error:", error)
+
+        encontrados = False
+
+        for pais in lista_paises:
+
+            if rango_minimo <= pais["superficie"] <= rango_maximo:
+
+                print("-"*30)
+                mostrar_pais(pais)
+                encontrados = True
+
+        if not encontrados:
+            print("No se encontraron coincidencias.")
 
 
 def ordenar_paises(lista_paises):
