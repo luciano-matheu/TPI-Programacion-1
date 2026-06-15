@@ -1,5 +1,4 @@
 import csv
-from multiprocessing import Value
 
 
 def cargar_csv(nombre_archivo):
@@ -130,7 +129,7 @@ def agregar_pais(lista_paises):
     }
 
     try:
-        with open("paises.csv", "a", encoding="utf-8", newline="") as archivo:
+        with open(ARCHIVO, "a", encoding="utf-8", newline="") as archivo:
             writer = csv.DictWriter(archivo, fieldnames=[
                 "nombre", "poblacion", "superficie", "continente"])
             writer.writerow(nuevo_pais)
@@ -148,7 +147,112 @@ def agregar_pais(lista_paises):
 
 def actualizar_pais(lista_paises):
     """Busca un país por nombre y actualiza su población y/o superficie."""
-    pass
+
+    while True:
+        try:
+
+            print("Actualizar datos de un país")
+
+            busqueda = input(
+                "\nIngrese el nombre del país que desea actualizar: ").strip().lower()
+
+            if busqueda == "":
+                raise ValueError("Nombre vacío.")
+
+            encontrado = False
+
+            for pais in lista_paises:
+
+                if pais["nombre"].lower() == busqueda:
+
+                    encontrado = True
+                    break
+
+            if not encontrado:
+                raise ValueError("El país buscado no forma parte del dataset.")
+
+            break
+
+        except ValueError as error:
+            print("\nHa ocurrido el siguiente error: ", error)
+
+    while True:
+
+        try:
+            print("\n¿Qúe desea actualizar?")
+            print("1. Población")
+            print("2. Superficie")
+
+            opcion = int(input("\nSeleccione una opción [1-2]: "))
+
+            if not opcion in [1, 2]:
+                raise ValueError("Opción fuera de rango.")
+
+            else:
+                break
+
+        except ValueError as error:
+            print("\nHa ocurrido el siguiente error: ", error)
+
+    if opcion == 1:
+
+        while True:
+            try:
+
+                nueva_poblacion = int(
+                    input(f"\nIngrese la nueva población de {busqueda}: "))
+
+                if nueva_poblacion <= 0:
+                    raise ValueError(
+                        "La población no puede ser menor o igual a 0.")
+
+                break
+
+            except ValueError as error:
+                print("Ha ocurrido el siguiente error: ", error)
+
+        for pais in lista_paises:
+
+            if pais["nombre"].lower() == busqueda:
+
+                pais["poblacion"] = nueva_poblacion
+
+                print("\nPoblación modificada con éxito.")
+                print("Volviendo al menú principal...")
+
+    elif opcion == 2:
+
+        while True:
+            try:
+
+                nueva_superficie = int(
+                    input(f"\nIngrese la nueva superficie de {busqueda}: "))
+
+                if nueva_superficie <= 0:
+                    raise ValueError(
+                        "La superficie no puede ser menor o igual a 0.")
+
+                break
+
+            except ValueError as error:
+                print("\nHa ocurrido el siguiente error: ", error)
+
+        for pais in lista_paises:
+
+            if pais["nombre"].lower() == busqueda:
+
+                pais["superficie"] = nueva_superficie
+
+                print("Superficie modificada con éxito.")
+                print("Volviendo al menú principal...")
+
+    with open(ARCHIVO, "w", encoding="utf-8") as archivo:
+
+        escritor = csv.DictWriter(archivo, fieldnames=[
+            "nombre", "poblacion", "superficie", "continente"])
+
+        escritor.writeheader()
+        escritor.writerows(lista_paises)
 
 
 def buscar_por_nombre(lista_paises):
@@ -171,7 +275,8 @@ def mostrar_estadisticas(lista_paises):
     pass
 
 
-lista_paises = cargar_csv("paises.csv")
+ARCHIVO = "paises.csv"
+lista_paises = cargar_csv(ARCHIVO)
 
 
 # Main
