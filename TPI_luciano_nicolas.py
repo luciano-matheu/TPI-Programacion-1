@@ -246,13 +246,28 @@ def actualizar_pais(lista_paises):
                 print("Superficie modificada con éxito.")
                 print("Volviendo al menú principal...")
 
-    with open(ARCHIVO, "w", encoding="utf-8") as archivo:
+    try:
+        # Actualizo el archivo CSV con los nuevos datos.
+        with open(ARCHIVO, "w", encoding="utf-8") as archivo:
 
-        escritor = csv.DictWriter(archivo, fieldnames=[
-            "nombre", "poblacion", "superficie", "continente"])
+            escritor = csv.DictWriter(
+                archivo,
+                fieldnames=[
+                    "nombre",
+                    "poblacion",
+                    "superficie",
+                    "continente"
+                ]
+            )
 
-        escritor.writeheader()
-        escritor.writerows(lista_paises)
+            escritor.writeheader()
+            escritor.writerows(lista_paises)
+
+    except PermissionError:
+        print("Error: no se tienen permisos para modificar el archivo.")
+
+    except OSError as error:
+        print("Error al intentar actualizar el archivo:", error)
 
 
 def buscar_por_nombre(lista_paises):
@@ -416,12 +431,132 @@ def filtrar_paises(lista_paises):
 
 def ordenar_paises(lista_paises):
     """Muestra un submenú para ordenar por nombre, población o superficie."""
-    pass
+
+    while True:
+        try:
+            print("\n¿Por qué parámetro desea ordenar?")
+            print("1. Nombre")
+            print("2. Población")
+            print("3. Superficie")
+
+            opcion = int(input("Seleccione una opción [1-3]: "))
+
+            if opcion not in [1, 2, 3]:
+                raise ValueError("Opción fuera de rango.")
+
+            break
+
+        except ValueError as error:
+            print("\nHa ocurrido el siguiente error:", error)
+
+    while True:
+        try:
+            print("\n¿En qué orden desea mostrar los resultados?")
+            print("1. Ascendente")
+            print("2. Descendente")
+
+            orden = int(input("Seleccione una opción [1-2]: "))
+
+            if orden not in [1, 2]:
+                raise ValueError("Opción fuera de rango.")
+
+            break
+
+        except ValueError as error:
+            print("\nHa ocurrido el siguiente error:", error)
+
+    # En esta variable obtengo si el usuario desea orden ascendente o descendente sabiendo True o False
+    reverse = orden == 2
+
+    if opcion == 1:
+        # Filtro con sorted y uso lambda para indicar la clave por la que se tiene que guiar.
+        lista_ordenada = sorted(
+            lista_paises, key=lambda pais: pais["nombre"], reverse=reverse)
+
+    elif opcion == 2:
+        lista_ordenada = sorted(
+            lista_paises, key=lambda pais: pais["poblacion"], reverse=reverse)
+
+    elif opcion == 3:
+        lista_ordenada = sorted(
+            lista_paises, key=lambda pais: pais["superficie"], reverse=reverse)
+
+    for pais in lista_ordenada:
+        mostrar_pais(pais)
 
 
 def mostrar_estadisticas(lista_paises):
     """Muestra estadísticas generales del dataset."""
-    pass
+
+    if not lista_paises:
+        print("\nNo hay países cargados.")
+        return
+
+    # Hago uso de max y min para obtener el país con mayor y menor población.
+    pais_mayor = max(lista_paises, key=lambda pais: pais["poblacion"])
+    pais_menor = min(lista_paises, key=lambda pais: pais["poblacion"])
+
+    # Lo mismo para la superficie.
+    pais_mayor_superficie = max(
+        lista_paises, key=lambda pais: pais["superficie"])
+
+    pais_menor_superficie = min(
+        lista_paises, key=lambda pais: pais["superficie"])
+
+    # Inicializo 2 variables en 0 para luego calcular promedios.
+    suma_poblacion = 0
+    suma_superficie = 0
+
+    # Hago uso de un diccionario para guardar continentes y cuantos países forman parte de él.
+    continentes = {}
+
+    for pais in lista_paises:
+
+        suma_poblacion += pais["poblacion"]
+        suma_superficie += pais["superficie"]
+
+        continente = pais["continente"]
+
+        if continente in continentes:
+            continentes[continente] += 1
+
+        else:
+            continentes[continente] = 1
+
+    promedio_poblacion = suma_poblacion / len(lista_paises)
+    promedio_superficie = suma_superficie / len(lista_paises)
+
+    print("\nESTADÍSTICAS:")
+
+    print(
+        f"\nPaís con mayor población: "
+        f"{pais_mayor['nombre'].title()} ({pais_mayor['poblacion']:,})"
+    )
+
+    print(
+        f"País con menor población: "
+        f"{pais_menor['nombre'].title()} ({pais_menor['poblacion']:,})"
+    )
+
+    print(
+        f"\nPaís con mayor superficie: "
+        f"{pais_mayor_superficie['nombre'].title()} "
+        f"({pais_mayor_superficie['superficie']:,} km²)"
+    )
+
+    print(
+        f"País con menor superficie: "
+        f"{pais_menor_superficie['nombre'].title()} "
+        f"({pais_menor_superficie['superficie']:,} km²)"
+    )
+
+    print(f"\nPromedio de población: {promedio_poblacion:,.2f}")
+    print(f"Promedio de superficie: {promedio_superficie:,.2f} km²")
+
+    print("\nCantidad de países por continente:")
+
+    for continente, cantidad in continentes.items():
+        print(f"- {continente.title()}: {cantidad}")
 
 
 ARCHIVO = "paises.csv"
@@ -465,7 +600,7 @@ while True:
             mostrar_estadisticas(lista_paises)
 
         elif opcion == 8:
-            print("¡Hasta luego!")
+            print("Saliendo del sistema...")
             break
 
         else:
